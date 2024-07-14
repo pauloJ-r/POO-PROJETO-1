@@ -25,6 +25,36 @@ public class Conta implements Serializable {
 		this.setDataAbertura(LocalDateTime.now());
 		this.setTransacoes(new ArrayList<>());
 	}
+	public void depositar(BigDecimal valor) {
+        saldo = saldo.add(valor);
+        transacoes.add(new Transacao(valor, TipoTransacao.CREDITO, LocalDateTime.now(), this));
+    }
+	 public void sacar(BigDecimal valor) {
+	        if (saldo.compareTo(valor) >= 0) {
+	            saldo = saldo.subtract(valor);
+	            transacoes.add(new Transacao(valor, TipoTransacao.DEBITO, LocalDateTime.now(), this));
+	        } else {
+	            System.out.println("Saldo insuficiente.");
+	        }
+	}
+	    public void transferir(BigDecimal valor, Conta destino) {
+	        if (saldo.compareTo(valor) >= 0) {
+	            sacar(valor);
+	            destino.depositar(valor);
+	            transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), destino));
+	        } else {
+	            System.out.println("Saldo insuficiente.");
+	        }
+	    }
+
+	    public void imprimirExtrato(int mes, int ano) {
+	        System.out.println("Extrato do mês " + mes + "/" + ano + " para a conta " + numero);
+	        for (Transacao transacao : transacoes) {
+	            if (transacao.getData().getMonthValue() == mes && transacao.getData().getYear() == ano) {
+	                System.out.println(transacao);
+	            }
+	        }
+	    }
 
 	public String getNumero() {
 		return numero;
