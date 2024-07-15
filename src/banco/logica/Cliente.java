@@ -20,19 +20,13 @@ public class Cliente implements Serializable {
 		this.nome = nome;
 	}
 	
-	public void addConta(Conta c) {
-		if(contas.contains(c))
-			System.out.println("A conta já foi adicionada");
-		else
-			this.contas.add(c);
+    public void addConta(Conta conta) {
+        contas.add(conta);
+    }
 
-	}
-	public void remConta(Conta c) {
-		if(contas.contains(c))
-			this.contas.remove(c);
-		else
-			System.out.println("Conta inexistente");
-	}
+    public void remConta(Conta conta) {
+        contas.remove(conta);
+    }
 	public Conta localizarConta(String numero) {
 		for(Conta c : contas) {
 		   if(c.getNumero().equals(numero)) {
@@ -41,6 +35,7 @@ public class Cliente implements Serializable {
 		}
 		return null;
 	}
+	
 	
 	public ArrayList<Conta> getContas() {
 		return contas;
