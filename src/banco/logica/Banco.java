@@ -44,17 +44,6 @@ public class Banco implements Serializable {
 
 	}
 	
-	public static Cliente localizarClientePorCPF(String cpf) {
-		Cliente c = new Cliente(cpf, null);
-		c.setCpf(cpf);
-		if(cadastroClientes.contains(c)) {
-			int index = cadastroClientes.indexOf(c);
-			c = cadastroClientes.get(index);
-			return c;
-		}else
-			return null;
-	}
-	
 	public static void listarClientes() {
 	    if (cadastroClientes.isEmpty()) {
 	        System.out.println("Nenhum cliente cadastrado.");

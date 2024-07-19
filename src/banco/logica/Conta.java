@@ -38,8 +38,11 @@ public class Conta implements Serializable {
 	        }
 	}
 	 	public void transferir(BigDecimal valor) {
-	        if (saldo.compareTo(valor) >= 0) {
-	            saldo = saldo.subtract(valor);
+	 		 if (valor.compareTo(BigDecimal.ZERO) <= 0) {
+	 	        System.out.println("O valor da transferência deve ser maior que zero.");
+	 	        return;
+	 	    }
+	 		 if (saldo.compareTo(valor) > 0) {
 	            transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), this));
 	            System.out.println("Transferência realizada com sucesso.");
 	        } else {

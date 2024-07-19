@@ -53,7 +53,7 @@ public class Aplicacao {
                 case 3: 
                 	 System.out.print("Digite o CPF do cliente: ");
                      String cpfBusca = scanner.nextLine();
-                     Cliente clienteEncontrado = Banco.localizarClientePorCPF(cpfBusca);
+                     Cliente clienteEncontrado = Banco.consultarClientePorCpf(cpfBusca);
                      if (clienteEncontrado != null) {
                          System.out.println("Cliente encontrado: " + clienteEncontrado);
                      } else {
