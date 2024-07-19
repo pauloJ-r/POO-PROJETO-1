@@ -37,18 +37,30 @@ public class Conta implements Serializable {
 	            System.out.println("Saldo insuficiente.");
 	        }
 	}
-	 	public void transferir(BigDecimal valor) {
-	 		 if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-	 	        System.out.println("O valor da transferência deve ser maior que zero.");
-	 	        return;
-	 	    }
-	 		 if (saldo.compareTo(valor) > 0) {
-	            transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), this));
-	            System.out.println("Transferência realizada com sucesso.");
-	        } else {
-	            System.out.println("Saldo insuficiente.");
-	        }
-	    }
+	 public void transferir(BigDecimal valor, Conta contaDestino) {
+		    if (valor.compareTo(BigDecimal.ZERO) <= 0) {
+		        System.out.println("O valor da transferência deve ser maior que zero.");
+		        return;
+		    }
+
+		    if (saldo.compareTo(valor) >= 0) {
+		        saldo = saldo.subtract(valor);
+		        transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), this));
+
+		        
+		        contaDestino.receberTransferencia(valor, this);
+
+		        System.out.println("Transferência realizada com sucesso.");
+		        Banco.salvarDadosEmArquivo();
+		    } else {
+		        System.out.println("Saldo insuficiente.");
+		    }
+		}
+
+		public void receberTransferencia(BigDecimal valor, Conta contaOrigem) {
+		    saldo = saldo.add(valor);
+		    transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_CREDITO, LocalDateTime.now(), contaOrigem));
+		}
 	    public void imprimirExtrato(int mes, int ano) {
 	        System.out.println("Extrato do mês " + mes + "/" + ano + " para a conta " + numero);
 	        for (Transacao transacao : transacoes) {

@@ -4,7 +4,8 @@ public enum TipoTransacao {
 	
 	DEBITO(1),
 	CREDITO(2),
-	TRANSFERENCIA_DEBITO(3);
+	TRANSFERENCIA_DEBITO(3),
+	TRANSFERENCIA_CREDITO(4);
 	
 	int valor;
 		

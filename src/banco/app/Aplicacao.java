@@ -7,7 +7,7 @@ import banco.logica.*;
 
 public class Aplicacao {
 	 private static List<Cliente> clientes;
-	private static Object cadastroClientes;
+	 private static Object cadastroClientes;
 
 	    public static void main(String[] args) {
 	        // Carregar os dados salvos
@@ -149,7 +149,7 @@ public class Aplicacao {
                 	                    scanner.nextLine();
 
                 	                    try {
-                	                        contaOrigem.transferir(valorTransferencia);
+                	                        contaOrigem.transferir(valorTransferencia, contaDestino);
                 	                    } catch (IllegalArgumentException e) {
                 	                        System.out.println(e.getMessage());
                 	                    }
