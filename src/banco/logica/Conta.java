@@ -37,16 +37,15 @@ public class Conta implements Serializable {
 	            System.out.println("Saldo insuficiente.");
 	        }
 	}
-	    public void transferir(BigDecimal valor, Conta destino) {
+	 	public void transferir(BigDecimal valor) {
 	        if (saldo.compareTo(valor) >= 0) {
-	            sacar(valor);
-	            destino.depositar(valor);
-	            transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), destino));
+	            saldo = saldo.subtract(valor);
+	            transacoes.add(new Transacao(valor, TipoTransacao.TRANSFERENCIA_DEBITO, LocalDateTime.now(), this));
+	            System.out.println("Transferência realizada com sucesso.");
 	        } else {
 	            System.out.println("Saldo insuficiente.");
 	        }
 	    }
-
 	    public void imprimirExtrato(int mes, int ano) {
 	        System.out.println("Extrato do mês " + mes + "/" + ano + " para a conta " + numero);
 	        for (Transacao transacao : transacoes) {
@@ -54,6 +53,9 @@ public class Conta implements Serializable {
 	                System.out.println(transacao);
 	            }
 	        }
+	    }
+	    public String toString() {
+	        return "Número: " + numero + ", Saldo: " + saldo;
 	    }
 
 	public String getNumero() {
@@ -94,6 +96,10 @@ public class Conta implements Serializable {
 
 	public void setTransacoes(List<Transacao> transacoes) {
 		this.transacoes = transacoes;
+	}
+	public char[] getExtrato() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

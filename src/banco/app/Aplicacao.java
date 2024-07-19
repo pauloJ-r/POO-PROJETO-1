@@ -7,10 +7,11 @@ import banco.logica.*;
 
 public class Aplicacao {
 	 private static List<Cliente> clientes;
+	private static Object cadastroClientes;
 
 	    public static void main(String[] args) {
 	        // Carregar os dados salvos
-	        clientes = Banco.carregarClientes();
+	    	 cadastroClientes = Banco.carregarDadosDeArquivo();
 
 	        Scanner scanner = new Scanner(System.in);
 	        int opcao;
@@ -35,47 +36,179 @@ public class Aplicacao {
 	            
 	           switch (opcao) {
                 case 1:
-                    cadastrarCliente(scanner);
-                    break;
+                	 System.out.print("Digite o nome do cliente: ");
+                     String nome = scanner.nextLine();
+
+                     System.out.print("Digite o CPF do cliente: ");
+                     String cpf = scanner.nextLine();
+
+                     Cliente novoCliente = new Cliente(nome, cpf);
+                     Banco.salvarCliente(novoCliente);
+                     break;
+                     
                 case 2:
-                    listarClientes();
-                    break;
-                case 3:
-                    consultarClientePorCpf(scanner);
-                    break;
+                	Banco.listarClientes();
+                	break;
+                	
+                case 3: 
+                	 System.out.print("Digite o CPF do cliente: ");
+                     String cpfBusca = scanner.nextLine();
+                     Cliente clienteEncontrado = Banco.localizarClientePorCPF(cpfBusca);
+                     if (clienteEncontrado != null) {
+                         System.out.println("Cliente encontrado: " + clienteEncontrado);
+                     } else {
+                         System.out.println("Cliente não encontrado!");
+                     }
+                     break;
                 case 4:
-                    removerCliente(scanner);
+                    System.out.print("Digite o CPF do cliente a ser removido: ");
+                    cpf = scanner.nextLine();
+                    Banco.removerCliente(cpf);
                     break;
                 case 5:
-                    criarConta(scanner);
-                    break;
-                case 6:
-                    listarContasDoCliente(scanner);
+                	System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine();
+                    Cliente cliente = Banco.consultarClientePorCpf(cpf);
+
+                    if (cliente != null) {
+                        System.out.print("Digite o número da conta: ");
+                        String num = scanner.nextLine();
+
+                        if (Banco.localizarContaGlobalmente(num) != null) {
+                            System.out.println("A conta já existe.");
+                        } else {
+                            Conta conta = new Conta(num);
+                            Banco.adicionarContaAoCliente(cpf, conta);
+                            System.out.println("Conta criada com sucesso.");
+                        }
+                    } else {
+                        System.out.println("Cliente não encontrado.");
+                    }
+                   break;
+                case 6: 
+                	System.out.print("Digite o CPF do cliente para listar suas contas: ");
+                    String cpfParaListarContas = scanner.nextLine();
+                    Cliente clienteParaListarContas = Banco.consultarClientePorCpf(cpfParaListarContas);
+                    if (clienteParaListarContas != null) {
+                        for (Conta conta : clienteParaListarContas.getContas()) {
+                            System.out.println(conta);
+                        }
+                    } else {
+                        System.out.println("Cliente não encontrado.");
+                    }
                     break;
                 case 7:
-                    removerConta(scanner);
-                    break;
+                	 System.out.print("Digite o CPF do cliente: ");
+                     cpf = scanner.nextLine();
+                     System.out.print("Digite o número da conta a ser removida: ");
+                     String numeroConta = scanner.nextLine();
+                     Banco.removerContaDoCliente(cpf, numeroConta);
+                     break;
                 case 8:
-                    realizarDeposito(scanner);
+                    System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine();
+                    System.out.print("Digite o número da conta: ");
+                    numeroConta = scanner.nextLine();
+                    System.out.print("Digite o valor do depósito: ");
+                    BigDecimal valorDeposito = scanner.nextBigDecimal();
+                    Banco.realizarDeposito(cpf, numeroConta, valorDeposito);
                     break;
                 case 9:
-                    realizarSaque(scanner);
+                    System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine();
+                    System.out.print("Digite o número da conta: ");
+                    numeroConta = scanner.nextLine();
+                    System.out.print("Digite o valor do saque: ");
+                    BigDecimal valorSaque = scanner.nextBigDecimal();
+                    Banco.realizarSaque(cpf, numeroConta, valorSaque);
                     break;
+                
                 case 10:
-                    efetuarTransferencia(scanner);
-                    break;
+                	 System.out.print("Digite o CPF do cliente da conta de origem: ");
+                	    String cpfOrigem = scanner.nextLine();
+                	    Cliente clienteOrigem = Banco.consultarClientePorCpf(cpfOrigem);
+
+                	    if (clienteOrigem != null) {
+                	        System.out.print("Digite o número da conta de origem: ");
+                	        String numeroContaOrigem = scanner.nextLine();
+                	        Conta contaOrigem = clienteOrigem.localizarConta(numeroContaOrigem);
+
+                	        if (contaOrigem != null) {
+                	            System.out.print("Digite o CPF do cliente da conta de destino: ");
+                	            String cpfDestino = scanner.nextLine();
+                	            Cliente clienteDestino = Banco.consultarClientePorCpf(cpfDestino);
+
+                	            if (clienteDestino != null) {
+                	                System.out.print("Digite o número da conta de destino: ");
+                	                String numeroContaDestino = scanner.nextLine();
+                	                Conta contaDestino = clienteDestino.localizarConta(numeroContaDestino);
+
+                	                if (contaDestino != null) {
+                	                    System.out.print("Digite o valor da transferência: ");
+                	                    BigDecimal valorTransferencia = scanner.nextBigDecimal();
+                	                    scanner.nextLine();
+
+                	                    try {
+                	                        contaOrigem.transferir(valorTransferencia);
+                	                    } catch (IllegalArgumentException e) {
+                	                        System.out.println(e.getMessage());
+                	                    }
+                	                } else {
+                	                    System.out.println("Conta de destino não encontrada.");
+                	                }
+                	            } else {
+                	                System.out.println("Cliente de destino não encontrado.");
+                	            }
+                	        } else {
+                	            System.out.println("Conta de origem não encontrada.");
+                	        }
+                	    } else {
+                	        System.out.println("Cliente de origem não encontrado.");
+                	    }
+                	    break;
                 case 11:
-                    imprimirExtrato(scanner);
+                	System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine();
+                    cliente = Banco.consultarClientePorCpf(cpf);
+
+                    if (cliente != null) {
+                        System.out.print("Digite o número da conta: ");
+                        numeroConta = scanner.nextLine();
+                        Conta conta = cliente.localizarConta(numeroConta);
+
+                        if (conta != null) {
+                            System.out.print("Digite o mês (1-12): ");
+                            int mes = scanner.nextInt();
+                            System.out.print("Digite o ano: ");
+                            int ano = scanner.nextInt();
+                            scanner.nextLine();  
+
+                           
+                            Banco.imprimirExtrato(cpf, numeroConta, mes, ano);
+                        } else {
+                            System.out.println("Conta não encontrada.");
+                        }
+                    } else {
+                        System.out.println("Cliente não encontrado.");
+                    }
                     break;
+
                 case 12:
-                    consultarSaldo(scanner);
+                    System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine(); 
+                    System.out.print("Digite o número da conta: ");
+                    numeroConta = scanner.nextLine(); 
+                    Banco.consultarSaldo(cpf, numeroConta); 
                     break;
+
                 case 13:
-                    consultarBalanco(scanner);
+                    System.out.print("Digite o CPF do cliente: ");
+                    cpf = scanner.nextLine(); 
+                    Banco.consultarBalancoDasContas(cpf); 
                     break;
                 case 0:
                     // Salvar os dados antes de sair
-                    Banco.salvarClientes(clientes);
+                    Banco.salvarDadosEmArquivo();
                     System.out.println("Dados salvos. Saindo...");
                     break;
                 default:
@@ -87,257 +220,4 @@ public class Aplicacao {
     }
 
 
-
-	    private static void cadastrarCliente(Scanner scanner) {
-	    	 System.out.print("Digite o CPF do cliente: ");
-	    	    String cpf = scanner.nextLine();
-	    	    
-	    	    // Verificar se o cliente já existe
-	    	    if (localizarCliente(cpf) != null) {
-	    	        System.out.println("O cliente já existe.");
-	    	    } else {
-	    	        System.out.print("Digite o nome do cliente: ");
-	    	        String nome = scanner.nextLine();
-	    	        Cliente cliente = new Cliente(cpf, nome);
-	    	        clientes.add(cliente);
-	    	        System.out.println("Cliente cadastrado com sucesso.");
-	    	    }
-	    }
-
-	    private static void listarClientes() {
-	        System.out.println("Clientes cadastrados:");
-	        for (Cliente cliente : clientes) {
-	            System.out.println("CPF: " + cliente.getCpf() + ", Nome: " + cliente.getNome());
-	        }
-	    }
-
-	    private static void consultarClientePorCpf(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.println("CPF: " + cliente.getCpf() + ", Nome: " + cliente.getNome());
-	            System.out.println("Contas do cliente:");
-	            for (Conta conta : cliente.getContas()) {
-	                System.out.println("Número: " + conta.getNumero() + ", Saldo: " + conta.getSaldo());
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void removerCliente(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            clientes.remove(cliente);
-	            System.out.println("Cliente removido com sucesso.");
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void criarConta(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-
-	            if (localizarContaGlobalmente(num) != null) {
-	                System.out.println("A conta já existe.");
-	            } else {
-	                Conta conta = new Conta(num);
-	                cliente.addConta(conta);
-	                System.out.println("Conta criada com sucesso.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-
-	    private static void listarContasDoCliente(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.println("Contas do cliente:");
-	            for (Conta conta : cliente.getContas()) {
-	                System.out.println("Número: " + conta.getNumero() + ", Saldo: " + conta.getSaldo());
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void removerConta(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-	            Conta conta = cliente.localizarConta(num);
-	            if (conta != null) {
-	                cliente.remConta(conta);
-	                System.out.println("Conta removida com sucesso.");
-	            } else {
-	                System.out.println("Conta não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void realizarDeposito(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-	            Conta conta = cliente.localizarConta(num);
-	            if (conta != null) {
-	                System.out.print("Digite o valor do depósito: ");
-	                BigDecimal valor = scanner.nextBigDecimal();
-	                conta.depositar(valor);
-	                System.out.println("Depósito realizado com sucesso.");
-	            } else {
-	                System.out.println("Conta não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void realizarSaque(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-	            Conta conta = cliente.localizarConta(num);
-	            if (conta != null) {
-	                System.out.print("Digite o valor do saque: ");
-	                BigDecimal valor = scanner.nextBigDecimal();
-	                conta.sacar(valor);
-	                System.out.println("Saque realizado com sucesso.");
-	            } else {
-	                System.out.println("Conta não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void efetuarTransferencia(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente de origem: ");
-	        String cpfOrigem = scanner.nextLine();
-	        Cliente clienteOrigem = localizarCliente(cpfOrigem);
-	        if (clienteOrigem != null) {
-	            System.out.print("Digite o número da conta de origem: ");
-	            String numOrigem = scanner.nextLine();
-	            Conta contaOrigem = clienteOrigem.localizarConta(numOrigem);
-	            if (contaOrigem != null) {
-	                System.out.print("Digite o CPF do cliente de destino: ");
-	                String cpfDestino = scanner.nextLine();
-	                Cliente clienteDestino = localizarCliente(cpfDestino);
-	                if (clienteDestino != null) {
-	                    System.out.print("Digite o número da conta de destino: ");
-	                    String numDestino = scanner.nextLine();
-	                    Conta contaDestino = clienteDestino.localizarConta(numDestino);
-	                    if (contaDestino != null) {
-	                        System.out.print("Digite o valor da transferência: ");
-	                        BigDecimal valor = scanner.nextBigDecimal();
-	                        contaOrigem.transferir(valor, contaDestino);
-	                        System.out.println("Transferência realizada com sucesso.");
-	                    } else {
-	                        System.out.println("Conta de destino não encontrada.");
-	                    }
-	                } else {
-	                    System.out.println("Cliente de destino não encontrado.");
-	                }
-	            } else {
-	                System.out.println("Conta de origem não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente de origem não encontrado.");
-	        }
-	    }
-
-	    private static void imprimirExtrato(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-	            Conta conta = cliente.localizarConta(num);
-	            if (conta != null) {
-	                System.out.print("Digite o mês: ");
-	                int mes = scanner.nextInt();
-	                System.out.print("Digite o ano: ");
-	                int ano = scanner.nextInt();
-	                conta.imprimirExtrato(mes, ano);
-	            } else {
-	                System.out.println("Conta não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void consultarSaldo(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            System.out.print("Digite o número da conta: ");
-	            String num = scanner.nextLine();
-	            Conta conta = cliente.localizarConta(num);
-	            if (conta != null) {
-	                System.out.println("Saldo da conta " + num + ": " + conta.getSaldo());
-	            } else {
-	                System.out.println("Conta não encontrada.");
-	            }
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static void consultarBalanco(Scanner scanner) {
-	        System.out.print("Digite o CPF do cliente: ");
-	        String cpf = scanner.nextLine();
-	        Cliente cliente = localizarCliente(cpf);
-	        if (cliente != null) {
-	            BigDecimal balanco = cliente.getBalanco();
-	            System.out.println("Balanço das contas do cliente: " + balanco);
-	        } else {
-	            System.out.println("Cliente não encontrado.");
-	        }
-	    }
-
-	    private static Cliente localizarCliente(String cpf) {
-	        for (Cliente cliente : clientes) {
-	            if (cliente.getCpf().equals(cpf)) {
-	                return cliente;
-	            }
-	        }
-	        return null;
-	    }
-	   private static Conta localizarContaGlobalmente(String numero) {
-		   for (Cliente cliente : clientes) {
-			   Conta conta = cliente.localizarConta(numero);
-			   if (conta != null) {
-				   return conta;
-			   }
-		   }
-		   return null;
-	   }
-	}
-
+}

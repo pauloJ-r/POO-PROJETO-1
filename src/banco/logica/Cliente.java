@@ -15,9 +15,9 @@ public class Cliente implements Serializable {
 	private String nome;
 	private ArrayList<Conta> contas = new ArrayList<>();
 	
-	public Cliente(String cpf, String nome) {
-		this.cpf = cpf;
+	public Cliente(String nome, String cpf) {
 		this.nome = nome;
+		this.cpf = cpf;
 	}
 	
     public void addConta(Conta conta) {
